@@ -1,3 +1,4 @@
-<img width="693" height="468" alt="image" src="https://github.com/user-attachments/assets/02ebe507-674d-4231-9342-14b1fa48ffe9" /># Lung-Cancer-Subtype-Classification
+This repository contains the code and data for the paper "Automated Diagnosis of Pulmonary Nodules in 3D PET/CT Images Using Dual-path Densely Connected Networks with Cross-modal Fusion". The code will be made public once the article is accepted！
+<img width="693" height="468" alt="image" src="https://github.com/user-attachments/assets/02ebe507-674d-4231-9342-14b1fa48ffe9" />
 We propose MAFF-Net for lung cancer subtype classification based on multimodal PET/CT images. The task involves distinguishing between highly similar lesion types under conditions of limited lesion volume and high background interference. To address these challenges, MAFF-Net is designed to extract fine-grained complementary representations from different imaging modalities and integrate them in a robust, confidence-adaptive manner.
 ![Uploading image.png…]()
