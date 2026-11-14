@@ -110,106 +110,11 @@ class Bottleneck(nn.Module):
         return self.relu(out)
 
 
-# # ---- ResNet3D with PE ----
-# class ResNet3D(nn.Module):
-#     def __init__(self, block, layers, num_classes):
-#         super().__init__()
-#         self.in_channels = 64
-
-#         self.conv1 = nn.Conv3d(1, 64, kernel_size=(3,7,7), stride=(1,2,2), padding=(1,3,3), bias=False)
-#         self.bn1 = nn.BatchNorm3d(64)
-#         self.relu = nn.ReLU(inplace=True)
-#         self.max_pool = nn.MaxPool3d(kernel_size=(1,3,3), stride=(1,2,2), padding=(0,1,1))
-
-#         self.layer1 = self._make_layer(block, 64, layers[0])
-#         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
-#         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-#         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-
-#         # ---- Add PE Module after layer4 ----
-#         self.pe = PositionEmbedding3D(in_channels=512 * block.expansion)
-
-#         self.avg_pool = nn.AdaptiveAvgPool3d(1)
-#         self.fc = nn.Linear(512 * block.expansion, num_classes)
-
-#         # init
-#         for m in self.modules():
-#             if isinstance(m, nn.Conv3d):
-#                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
-#             elif isinstance(m, nn.BatchNorm3d):
-#                 m.weight.data.fill_(1)
-#                 m.bias.data.zero_()
-
-#     def _make_layer(self, block, channels, blocks, stride=1):
-#         layers = [block(self.in_channels, channels, stride)]
-#         self.in_channels = channels * block.expansion
-#         for _ in range(1, blocks):
-#             layers.append(block(self.in_channels, channels))
-#         return nn.Sequential(*layers)
-
-#     def forward(self, x, debug=False):
-#         out = self.relu(self.bn1(self.conv1(x)))
-#         if debug: print("After conv1:", out.shape)
-
-#         out = self.max_pool(out)
-#         if debug: print("After max_pool:", out.shape)
-
-#         out = self.layer1(out)
-#         if debug: print("After layer1:", out.shape)
-
-#         out = self.layer2(out)
-#         if debug: print("After layer2:", out.shape)
-
-#         out = self.layer3(out)
-#         if debug: print("After layer3:", out.shape)
-
-#         out = self.layer4(out)
-#         if debug: print("After layer4:", out.shape)
-
-#         out = self.pe(out)
-#         if debug: print("After PE:", out.shape)
-
-#         out = self.avg_pool(out)
-#         if debug: print("After avg_pool:", out.shape)
-
-#         out = out.view(out.size(0), -1)
-#         out = self.fc(out)
-#         return out
-
-# # ---- Model Variants ----
-# def resnet10(num_classes):
-#     return ResNet3D(Bottleneck, [1, 1, 1, 1], num_classes=num_classes)
-
-# def resnet18(num_classes):
-#     return ResNet3D(Bottleneck, [2, 2, 2, 2], num_classes=num_classes)
-
-# def resnet26(num_classes):
-#     return ResNet3D(Bottleneck, [1, 2, 4, 1], num_classes=num_classes)
-
-# def resnet34(num_classes):
-#     return ResNet3D(Bottleneck, [3, 4, 6, 3], num_classes=num_classes)
-
-# def resnet50(num_classes):
-#     return ResNet3D(Bottleneck, [3, 4, 6, 3], num_classes=num_classes)
-
-
-# def resnet101(num_classes):
-#     return ResNet3D(Bottleneck, [3, 4, 23, 3], num_classes=num_classes)
-
-
-# def resnet152(num_classes):
-#     return ResNet3D(Bottleneck, [3, 8, 36, 3], num_classes=num_classes)
-
-# def resnet200(num_classes):
-#     return ResNet3D(Bottleneck, [3, 24, 36, 3], num_classes=num_classes)
-
-
 class ResNet3D(nn.Module):
     def __init__(self, block, layers, num_classes=None, extract_feature=False):
         super().__init__()
         self.in_channels = 64
-        self.extract_feature = extract_feature  # 是否只提取特征
-
+        self.extract_feature = extract_feature 
         self.conv1 = nn.Conv3d(1, 64, kernel_size=(3,7,7), stride=(1,2,2), padding=(1,3,3), bias=False)
         self.bn1 = nn.BatchNorm3d(64)
         self.relu = nn.ReLU(inplace=True)
@@ -270,15 +175,12 @@ class ResNet3D(nn.Module):
         out = out.view(out.size(0), -1)
 
         if self.extract_feature:
-            # 只返回特征向量，不做分类
             return out
         else:
             out = self.fc(out)
             return out
-
-# 只提取特征的resnet50函数
+            
 def resnet50_feature_extractor():
-    # num_classes不需要传，因为不做分类
     return ResNet3D(Bottleneck, [3, 4, 6, 3], num_classes=None, extract_feature=True)
 
 if __name__ == '__main__':
