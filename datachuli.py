@@ -1,36 +1,17 @@
-# 这些文件以NIFTI格式提供，扩展名为.nii。要阅读扫描，我们使用`nibabel`包。您可以通过`pip install nibabel`安装包。 CT扫描以Hounsfield单位（HU）存储原始体素强度。在这个数据集中，它们的范围从-1024到2000以上。400以上的骨骼具有不同的放射性强度，因此这被用作更高的界限。通常使用-1000到400之间的阈值来规范CT扫描。
-# 要处理数据，我们执行以下操作：
-# - 我们首先将体积旋转90度，因此方向是固定的。
-# - 我们将HU值缩放为介于0和1之间。
-# - 我们调整宽度，高度和深度的大小。
-# 在这里，我们定义了几个辅助函数来处理数据。在构建训练和验证数据集时将使用这些功能。
-#
-
 import os
 import torch
 import numpy as np
 import nibabel as nib
 from scipy import ndimage
 torch.__version__
-# nii.gz格式是医学图像常用的压缩格式，python中可用nibabel来读取保存。
 
 def read_nifti_file(filepath):
-    """读取和加载数据"""
     # Read file
     scan = nib.load(filepath)
     # Get raw data
     scan = scan.get_fdata()
     return scan
 
-# def normalize(volume):#CT
-#     """数据归一化"""
-#     min = -1000
-#     max = 400
-#     volume[volume < min] = min
-#     volume[volume > max] = max
-#     volume = (volume - min) / (max - min)
-#     volume = volume.astype("float32")
-#     return volume
 
 def normalize(volume):#PET
     """Normalize the data using Z-score normalization."""
@@ -39,30 +20,6 @@ def normalize(volume):#PET
     volume = (volume - mean) / std
     volume = volume.astype("float32")
     return volume
-
-
-# def resize_volume(img):
-#     """跨 z 轴调整大小"""
-#     # 设置所需的深度
-#     desired_depth = 128
-#     desired_width = 128
-#     desired_height = 128
-#     # 获取当前深度
-#     current_depth = img.shape[-1]
-#     current_width = img.shape[0]
-#     current_height = img.shape[1]
-#     # 计算深度因子
-#     depth = current_depth / desired_depth
-#     width = current_width / desired_width
-#     height = current_height / desired_height
-#     depth_factor = 1 / depth
-#     width_factor = 1 / width
-#     height_factor = 1 / height
-#     # 旋转
-#     # img = ndimage.rotate(img, 90, reshape=False)
-#     # 跨z轴调整大侠
-#     img = ndimage.zoom(img, (width_factor, height_factor, depth_factor), order=1)
-#     return img
 
 def resize_volume(img_data):
     # Create an empty array with the target shape, filled with zeros
@@ -108,12 +65,8 @@ def save_nifti_file(volume, original_path, target_dir="MosMedData_1"):
 
 
 def process_scan(path):
-    """读取和调整数据大小"""
-    # 读取扫描文件
     volume = read_nifti_file(path)
-    # 归一化
     volume = normalize(volume)
-    # 调整宽度、高度和深度
     volume = resize_volume(volume)
     return volume
 
