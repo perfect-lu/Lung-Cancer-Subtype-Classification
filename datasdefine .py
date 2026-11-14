@@ -1,4 +1,3 @@
-# 按照Dataset的使用规范，构建肺部数据集
 import numpy as np
 from torch.utils.data import Dataset
 from torchvision import transforms as transforms
