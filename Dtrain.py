@@ -19,18 +19,17 @@ LR = 1e-4
 weight_decay = 1e-5
 epoch_losses = []
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = resnet101(1)  # 假设是二分类任务，输出层仅有1个单元
+model = resnet101(1) 
 # model = generate_model(121)
-# model.fc = nn.Linear(model.fc.in_features, 1)  # 移除Sigmoid层针对model中resnet
-# 然后将模型移到正确的设备
-model.to(device)  # 确保模型移动到了CUDA设备上
+# model.fc = nn.Linear(model.fc.in_features, 1)
+model.to(device)  
 
 optimizer = optim.Adam(model.parameters(), lr=LR, weight_decay=weight_decay)
 lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=1)
 
 
-# criterion = nn.BCEWithLogitsLoss()  # 使用BCEWithLogitsLoss，resnet用
-# criterion = nn.CrossEntropyLoss()   #模型里面加softmax的时候
+# criterion = nn.BCEWithLogitsLoss() 
+# criterion = nn.CrossEntropyLoss() 
 # criterion = nn.FocalLoss()
 # criterion = nn.BCELoss()
 
@@ -82,7 +81,6 @@ for epoch in range(num_epochs):
         print('Global_Branch_model already save!')
     # time_elapsed = time.time() - since
     # print('Training one epoch complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-# 保存损失值和准确度到文本文件
 with open('./train_loss_acc/1.txt', 'w') as f:
     f.write("Epoch\tTrain Loss\tTrain Accuracy\n")
     for i in range(num_epochs):
